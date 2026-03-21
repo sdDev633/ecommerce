@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NOVA Store — Product</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">NO<span>V</span>A</a>
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="shop.html">Shop</a></li>
+    <li><a href="shop.html">New In</a></li>
+    <li><a href="shop.html">Sale</a></li>
+  </ul>
+  <a href="cart.html" class="nav-cart" id="cart-badge">🛒 Cart</a>
+</nav>
+
+<div class="page">
+  <div class="breadcrumb"><a href="index.html">Home</a> › <a href="shop.html">Shop</a> › <span id="bc-name">Product</span></div>
+
+  <div class="detail-grid" id="detail-content">
+    <div style="text-align:center;padding:40px;color:#888">Loading…</div>
+  </div>
+
+  <!-- RELATED -->
+  <div style="margin-top:60px">
+    <h2 style="font-size:20px;margin-bottom:20px">You Might Also Like</h2>
+    <div class="products-grid" id="related-grid"></div>
+  </div>
+</div>
+
+<footer>© 2026 <span>NOVA</span> Store. All rights reserved.</footer>
+<div id="toast"></div>
+<script src="app.js"></script>
+<script>
+const id = parseInt(new URLSearchParams(location.search).get('id'));
+const p = PRODUCTS.find(x=>x.id===id);
+
+if (!p) {
+  document.getElementById('detail-content').innerHTML = '<p>Product not found. <a href="shop.html">Go back to shop</a></p>';
+} else {
+  document.title = `NOVA — ${p.name}`;
+  document.getElementById('bc-name').textContent = p.name;
+  const discount = p.original ? Math.round((1-p.price/p.original)*100) : 0;
+
+  document.getElementById('detail-content').innerHTML = `
+    <div class="detail-img">${p.emoji}</div>
+    <div>
+      <div class="detail-brand">NOVA</div>
+      <h1 class="detail-name">${p.name}</h1>
+      <div class="detail-stars">★★★★★ <span style="color:#888;font-size:14px">(4.8 · 120 reviews)</span></div>
+      <div class="detail-price">${fmt(p.price)}</div>
+      ${p.original ? `<div class="detail-old">${fmt(p.original)} <span style="background:#fef3f2;color:#c0392b;font-size:12px;padding:2px 8px;border-radius:3px;font-weight:700">${discount}% OFF</span></div>` : ''}
+      <p class="detail-desc">${p.desc} Premium quality, carefully crafted for daily use.</p>
+
+      <div class="qty-row">
+        <label>Quantity:</label>
+        <button class="qty-btn" onclick="changeQty(-1)">−</button>
+        <span id="qty-display" style="font-size:16px;font-weight:600;min-width:28px;text-align:center">1</span>
+        <button class="qty-btn" onclick="changeQty(1)">+</button>
+      </div>
+
+      <div class="detail-actions">
+        <button class="btn btn-dark btn-full" onclick="doAddToCart()">🛒 Add to Cart</button>
+        <button class="btn btn-gold btn-full" onclick="buyNow()">⚡ Buy Now</button>
+        <button class="btn btn-outline btn-full" onclick="addToWishlist()">♡ Add to Wishlist</button>
+      </div>
+
+      <div style="margin-top:20px;padding:16px;background:#f9f9f9;border-radius:6px;font-size:13px;color:#666;line-height:1.8">
+        ✅ Free shipping on orders over ₹999<br>
+        🔄 Easy 30-day returns<br>
+        🔒 Secure checkout
+      </div>
+    </div>`;
+
+  // Related products
+  const related = PRODUCTS.filter(x=>x.id!==id).slice(0,4);
+  const rg = document.getElementById('related-grid');
+  rg.innerHTML = related.map(r => `
+  <div class="product-card">
+    <a href="product.html?id=${r.id}" style="text-decoration:none;color:inherit"><div class="product-img">${r.emoji}</div></a>
+    <div class="product-body">
+      <a href="product.html?id=${r.id}" style="text-decoration:none;color:inherit"><div class="product-name">${r.name}</div></a>
+      <div class="product-price">${fmt(r.price)}</div>
+      <div style="margin-bottom:12px"></div>
+      <div class="product-actions">
+        <button class="btn btn-dark btn-sm" onclick="addToCart(${r.id})">Add to Cart</button>
+        <a href="product.html?id=${r.id}" class="btn btn-outline btn-sm">View</a>
+      </div>
+    </div>
+  </div>`).join('');
+}
+
+let qty = 1;
+function changeQty(d) { qty = Math.max(1, qty+d); document.getElementById('qty-display').textContent = qty; }
+function doAddToCart() { if(p) { addToCart(p.id, qty); } }
+function buyNow() { if(p) { addToCart(p.id, qty); window.location.href='cart.html'; } }
+function addToWishlist() { showToast('Added to wishlist ❤️'); }
+</script>
+</body>
+</html>

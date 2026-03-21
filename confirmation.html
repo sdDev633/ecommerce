@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NOVA Store — Order Confirmed!</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">NO<span>V</span>A</a>
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="shop.html">Shop</a></li>
+  </ul>
+  <a href="cart.html" class="nav-cart" id="cart-badge">🛒 Cart</a>
+</nav>
+
+<div class="page">
+  <div class="confirm-box">
+    <div class="confirm-icon">🎉</div>
+    <h2>Order Confirmed!</h2>
+    <p>Thank you for your purchase. Your order has been placed successfully and will be shipped within 1–2 business days.</p>
+    <div class="order-id-box">Order ID: <strong id="order-id">—</strong></div>
+
+    <div style="background:#f9f9f9;border-radius:8px;padding:20px;margin-bottom:24px;text-align:left;font-size:14px;line-height:2">
+      📦 <strong>Estimated Delivery:</strong> 3–5 Business Days<br>
+      📧 <strong>Confirmation Email:</strong> Sent to your inbox<br>
+      🔄 <strong>Returns:</strong> 30-day easy returns<br>
+      📞 <strong>Support:</strong> support@novastore.com
+    </div>
+
+    <div class="confirm-actions">
+      <button onclick="trackOrder()" class="btn btn-dark">📍 Track Order</button>
+      <a href="shop.html" class="btn btn-gold">Continue Shopping</a>
+      <a href="index.html" class="btn btn-outline">Back to Home</a>
+    </div>
+  </div>
+</div>
+
+<footer>© 2026 <span>NOVA</span> Store. All rights reserved.</footer>
+<div id="toast"></div>
+<script src="app.js"></script>
+<script>
+const orderId = localStorage.getItem('nova_last_order') || ('NOVA' + Math.floor(10000+Math.random()*90000));
+document.getElementById('order-id').textContent = '#' + orderId;
+
+function trackOrder() {
+  showToast('Tracking: Your order is being packed! 📦');
+}
+</script>
+</body>
+</html>

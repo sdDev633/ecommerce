@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NOVA Store — Shop</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">NO<span>V</span>A</a>
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="shop.html">Shop</a></li>
+    <li><a href="shop.html">New In</a></li>
+    <li><a href="shop.html">Sale</a></li>
+  </ul>
+  <a href="cart.html" class="nav-cart" id="cart-badge">🛒 Cart</a>
+</nav>
+
+<div class="page-header">
+  <h1>Our Products</h1>
+  <p>Handpicked collections for every style</p>
+</div>
+
+<div class="page">
+  <div class="breadcrumb"><a href="index.html">Home</a> › Shop</div>
+
+  <!-- FILTERS -->
+  <div class="filter-bar">
+    <span style="font-size:13px;font-weight:600;color:#555">Filter:</span>
+    <button class="filter-btn active" onclick="filterProducts('all',this)">All</button>
+    <button class="filter-btn" onclick="filterProducts('bags',this)">Bags</button>
+    <button class="filter-btn" onclick="filterProducts('fashion',this)">Fashion</button>
+    <button class="filter-btn" onclick="filterProducts('home',this)">Home</button>
+    <button class="filter-btn" onclick="filterProducts('beauty',this)">Beauty</button>
+    <button class="filter-btn" onclick="filterProducts('sale',this)">Sale</button>
+  </div>
+
+  <div class="products-grid" id="shop-grid"></div>
+</div>
+
+<footer>© 2026 <span>NOVA</span> Store. All rights reserved.</footer>
+<div id="toast"></div>
+<script src="app.js"></script>
+<script>
+function renderGrid(list) {
+  const grid = document.getElementById('shop-grid');
+  if (!list.length) { grid.innerHTML = '<p style="color:#888">No products found.</p>'; return; }
+  grid.innerHTML = list.map(p => `
+  <div class="product-card">
+    <a href="product.html?id=${p.id}" style="text-decoration:none;color:inherit">
+      <div class="product-img">${p.emoji}</div>
+    </a>
+    <div class="product-body">
+      ${p.badge ? `<span class="badge badge-${p.badge}">${p.badge.toUpperCase()}</span>` : ''}
+      <a href="product.html?id=${p.id}" style="text-decoration:none;color:inherit"><div class="product-name">${p.name}</div></a>
+      <div class="product-price">${fmt(p.price)}</div>
+      ${p.original ? `<div class="product-old-price">${fmt(p.original)}</div>` : '<div style="margin-bottom:12px"></div>'}
+      <div class="product-actions">
+        <button class="btn btn-dark btn-sm" onclick="addToCart(${p.id})">Add to Cart</button>
+        <a href="product.html?id=${p.id}" class="btn btn-outline btn-sm">View</a>
+      </div>
+    </div>
+  </div>`).join('');
+}
+
+function filterProducts(cat, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const list = cat === 'all' ? PRODUCTS :
+    cat === 'sale' ? PRODUCTS.filter(p=>p.badge==='sale') :
+    PRODUCTS.filter(p=>p.category===cat);
+  renderGrid(list);
+}
+
+// Check URL param
+const urlCat = new URLSearchParams(location.search).get('cat') || 'all';
+renderGrid(urlCat === 'all' ? PRODUCTS : PRODUCTS.filter(p=>p.category===urlCat));
+if (urlCat !== 'all') {
+  document.querySelectorAll('.filter-btn').forEach(b=>{
+    if(b.textContent.toLowerCase()===urlCat) { b.classList.add('active'); document.querySelectorAll('.filter-btn')[0].classList.remove('active'); }
+  });
+}
+</script>
+</body>
+</html>

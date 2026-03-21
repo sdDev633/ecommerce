@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NOVA Store — Cart</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">NO<span>V</span>A</a>
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="shop.html">Shop</a></li>
+    <li><a href="shop.html">New In</a></li>
+    <li><a href="shop.html">Sale</a></li>
+  </ul>
+  <a href="cart.html" class="nav-cart" id="cart-badge">🛒 Cart</a>
+</nav>
+
+<div class="page-header">
+  <h1>🛒 Your Cart</h1>
+  <p>Review your items before checkout</p>
+</div>
+
+<div class="page">
+  <div class="breadcrumb"><a href="index.html">Home</a> › <a href="shop.html">Shop</a> › Cart</div>
+  <div id="cart-content"></div>
+</div>
+
+<footer>© 2026 <span>NOVA</span> Store. All rights reserved.</footer>
+<div id="toast"></div>
+<script src="app.js"></script>
+<script>
+let discount = 0;
+
+function renderCart() {
+  const cart = getCart();
+  const container = document.getElementById('cart-content');
+
+  if (!cart.length) {
+    container.innerHTML = `
+      <div class="empty-cart">
+        <div class="icon">🛒</div>
+        <p>Your cart is empty!</p>
+        <a href="shop.html" class="btn btn-gold">Continue Shopping</a>
+      </div>`;
+    return;
+  }
+
+  const sub = cartSubtotal();
+  const disc = Math.round(sub * discount);
+  const shipping = sub >= 999 ? 0 : 99;
+  const total = sub - disc + shipping;
+
+  container.innerHTML = `
+  <div style="display:grid;grid-template-columns:1fr 320px;gap:28px;align-items:start">
+    <div>
+      <table class="cart-table">
+        <thead><tr><th>Product</th><th>Price</th><th>Qty</th><th>Total</th><th></th></tr></thead>
+        <tbody>
+          ${cart.map(item => `
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:14px">
+                <span class="item-emoji">${item.emoji}</span>
+                <div>
+                  <a href="product.html?id=${item.id}" style="text-decoration:none;color:#222">
+                    <div class="item-name">${item.name}</div>
+                  </a>
+                  <button onclick="saveForLater(${item.id})" style="background:none;border:none;font-size:12px;color:#c9a84c;cursor:pointer;padding:0;margin-top:4px">Save for later</button>
+                </div>
+              </div>
+            </td>
+            <td>${fmt(item.price)}</td>
+            <td>
+              <div class="qty-controls">
+                <button class="qty-btn" onclick="changeItemQty(${item.id}, ${item.qty-1})">−</button>
+                <span style="font-weight:600">${item.qty}</span>
+                <button class="qty-btn" onclick="changeItemQty(${item.id}, ${item.qty+1})">+</button>
+              </div>
+            </td>
+            <td style="font-weight:600">${fmt(item.price * item.qty)}</td>
+            <td><button onclick="removeItem(${item.id})" class="btn btn-red btn-sm">Remove</button></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+
+      <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap">
+        <a href="shop.html" class="btn btn-outline">← Continue Shopping</a>
+        <button onclick="clearCartAll()" class="btn btn-outline" style="color:#c0392b;border-color:#c0392b">Clear Cart</button>
+      </div>
+
+      <!-- COUPON -->
+      <div style="margin-top:24px;background:#fff;padding:20px;border-radius:8px;border:1px solid #e0e0e0">
+        <div style="font-weight:600;margin-bottom:12px">Have a coupon?</div>
+        <div style="display:flex;gap:10px">
+          <input id="coupon" type="text" placeholder="Enter code (try NOVA15)" style="flex:1;padding:10px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;outline:none">
+          <button onclick="applyCoupon()" class="btn btn-dark">Apply</button>
+        </div>
+        <div id="coupon-msg" style="margin-top:8px;font-size:13px"></div>
+      </div>
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="cart-summary">
+      <h3 style="font-size:18px;font-weight:700;margin-bottom:20px">Order Summary</h3>
+      <div class="summary-row"><span>Subtotal</span><span>${fmt(sub)}</span></div>
+      <div class="summary-row"><span>Shipping</span><span class="${shipping===0?'free':''}">${shipping===0?'FREE':fmt(shipping)}</span></div>
+      ${disc ? `<div class="summary-row"><span>Discount</span><span style="color:#27ae60">-${fmt(disc)}</span></div>` : ''}
+      <div class="summary-row total"><span>Total</span><span>${fmt(total)}</span></div>
+
+      <a href="checkout.html" class="btn btn-gold btn-full" style="margin-top:20px;padding:14px">🔒 Proceed to Checkout</a>
+      <button onclick="showToast('Saved for later!')" class="btn btn-outline btn-full" style="margin-top:10px">Save Cart</button>
+
+      <div style="margin-top:16px;font-size:12px;color:#888;text-align:center;line-height:1.8">
+        🔒 Secure Checkout &nbsp;·&nbsp; 🚚 Free shipping ₹999+<br>
+        💳 Visa · Mastercard · UPI · COD
+      </div>
+    </div>
+  </div>`;
+}
+
+function changeItemQty(id, qty) { setQty(id, qty); renderCart(); }
+function removeItem(id) { removeFromCart(id); renderCart(); showToast('Item removed'); }
+function clearCartAll() { if(confirm('Clear all items?')) { saveCart([]); updateCartBadge(); renderCart(); } }
+function saveForLater(id) { removeFromCart(id); renderCart(); showToast('Saved for later!'); }
+
+function applyCoupon() {
+  const code = document.getElementById('coupon').value.trim().toUpperCase();
+  const msg = document.getElementById('coupon-msg');
+  if (code === 'NOVA15') { discount = 0.15; msg.style.color='#27ae60'; msg.textContent='✅ 15% discount applied!'; renderCart(); }
+  else if (code === 'SAVE10') { discount = 0.10; msg.style.color='#27ae60'; msg.textContent='✅ 10% discount applied!'; renderCart(); }
+  else { msg.style.color='#c0392b'; msg.textContent='❌ Invalid coupon code.'; }
+}
+
+renderCart();
+</script>
+</body>
+</html>

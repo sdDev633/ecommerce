@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NOVA Store — Home</title>
+<link rel="stylesheet" href="style.css">
+<style>
+.hero { background:#1a1a1a; padding:80px 32px; text-align:center; }
+.hero h1 { font-size:48px; color:#fff; margin-bottom:14px; }
+.hero h1 span { color:#c9a84c; }
+.hero p { color:#aaa; font-size:16px; margin-bottom:32px; max-width:500px; margin-left:auto; margin-right:auto; }
+.hero-btns { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+
+.categories { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:48px; }
+.cat-card { background:#fff; border-radius:8px; padding:28px 16px; text-align:center; border:1px solid #e0e0e0; cursor:pointer; text-decoration:none; color:#222; transition:box-shadow 0.2s; }
+.cat-card:hover { box-shadow:0 4px 16px rgba(0,0,0,0.1); }
+.cat-card .icon { font-size:40px; margin-bottom:10px; }
+.cat-card h4 { font-size:14px; font-weight:600; }
+
+.products-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:24px; }
+@media(max-width:900px){ .products-grid{grid-template-columns:repeat(2,1fr);} .categories{grid-template-columns:repeat(2,1fr);} }
+@media(max-width:480px){ .products-grid{grid-template-columns:1fr;} .categories{grid-template-columns:1fr 1fr;} }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">NO<span>V</span>A</a>
+  <ul>
+    <li><a href="index.html">Home</a></li>
+    <li><a href="shop.html">Shop</a></li>
+    <li><a href="shop.html">New In</a></li>
+    <li><a href="shop.html">Sale</a></li>
+  </ul>
+  <a href="cart.html" class="nav-cart" id="cart-badge">🛒 Cart</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <h1>Welcome to <span>NOVA</span> Store</h1>
+  <p>Discover premium products curated for the modern buyer. Quality and style, all in one place.</p>
+  <div class="hero-btns">
+    <a href="shop.html" class="btn btn-gold">Shop Now</a>
+    <a href="shop.html" class="btn btn-outline" style="color:#fff;border-color:#fff">Browse Collections</a>
+  </div>
+</section>
+
+<div class="page">
+
+  <!-- CATEGORIES -->
+  <div style="margin-bottom:20px">
+    <h2 style="font-size:22px;margin-bottom:20px">Shop by Category</h2>
+    <div class="categories">
+      <a href="shop.html?cat=bags" class="cat-card"><div class="icon">👜</div><h4>Bags</h4></a>
+      <a href="shop.html?cat=fashion" class="cat-card"><div class="icon">👗</div><h4>Fashion</h4></a>
+      <a href="shop.html?cat=home" class="cat-card"><div class="icon">🏠</div><h4>Home</h4></a>
+      <a href="shop.html?cat=beauty" class="cat-card"><div class="icon">💄</div><h4>Beauty</h4></a>
+    </div>
+  </div>
+
+  <!-- FEATURED -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+    <h2 style="font-size:22px">Featured Products</h2>
+    <a href="shop.html" class="btn btn-outline btn-sm">View All →</a>
+  </div>
+  <div class="products-grid" id="featured"></div>
+
+</div>
+
+<footer>© 2026 <span>NOVA</span> Store. All rights reserved.</footer>
+<div id="toast"></div>
+<script src="app.js"></script>
+<script>
+// Show first 4 products
+const grid = document.getElementById('featured');
+PRODUCTS.slice(0,4).forEach(p => {
+  grid.innerHTML += `
+  <div class="product-card">
+    <a href="product.html?id=${p.id}" style="text-decoration:none;color:inherit">
+      <div class="product-img">${p.emoji}</div>
+    </a>
+    <div class="product-body">
+      ${p.badge ? `<span class="badge badge-${p.badge}">${p.badge.toUpperCase()}</span>` : ''}
+      <a href="product.html?id=${p.id}" style="text-decoration:none;color:inherit"><div class="product-name">${p.name}</div></a>
+      <div class="product-price">${fmt(p.price)}</div>
+      ${p.original ? `<div class="product-old-price">${fmt(p.original)}</div>` : '<div style="margin-bottom:12px"></div>'}
+      <div class="product-actions">
+        <button class="btn btn-dark btn-sm" onclick="addToCart(${p.id})">Add to Cart</button>
+        <a href="product.html?id=${p.id}" class="btn btn-outline btn-sm">View</a>
+      </div>
+    </div>
+  </div>`;
+});
+</script>
+</body>
+</html>
